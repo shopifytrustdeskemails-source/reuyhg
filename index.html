@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fast Mail Send - Email Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f0f4ff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .header .badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .card .count {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        textarea,
+        input {
+            width: 100%;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus,
+        input:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Email List */
+        .email-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 8px;
+            background: #fafafa;
+        }
+
+        .email-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: white;
+            margin-bottom: 4px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .email-item:hover {
+            background: #eef2ff;
+        }
+
+        .email-item .addr {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .email-item .btn-send {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .email-item .btn-send:hover {
+            background: #4338ca;
+        }
+
+        /* Preview Box */
+        .preview-box {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 16px;
+            border: 2px solid #e5e7eb;
+            min-height: 80px;
+            white-space: pre-wrap;
+            font-size: 14px;
+            color: #1f2937;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.01);
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #1f2937;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .stat-box {
+            flex: 1;
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-box .num {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .stat-box .label {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* Template buttons */
+        .template-btns {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .template-btns button {
+            background: #eef2ff;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #4f46e5;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .template-btns button:hover {
+            background: #dbeafe;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .action-row .btn-secondary {
+            flex: 1;
+            text-align: center;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Upload area */
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .upload-area:hover {
+            border-color: #4f46e5;
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .small-text {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 6px;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gap-2 {
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>📧 Fast Mail Send</h1>
+                <span style="font-size: 14px; opacity: 0.8;">Open emails in Gmail with one click</span>
+            </div>
+            <span class="badge">⚡ Ready</span>
+        </div>
+
+        <div class="grid">
+
+            <!-- LEFT COLUMN -->
+            <div>
+
+                <!-- Email Input -->
+                <div class="card">
+                    <h3>📋 Required Email</h3>
+                    <p class="count">Enter each email on a new line or paste multiple lists</p>
+                    <textarea id="emailInput" placeholder="john@example.com&#10;sarah@company.com&#10;mike@work.io" rows="6"></textarea>
+                    <div class="flex-between" style="margin-top: 8px;">
+                        <span class="small-text" id="emailCount">Total 0 emails</span>
+                        <button class="btn-secondary" onclick="clearEmails()">Clear All</button>
+                    </div>
+                    <div class="email-list" id="emailList"></div>
+                </div>
+
+                <!-- Subject -->
+                <div class="card">
+                    <h3>📝 Subject Line</h3>
+                    <input type="text" id="subjectInput" placeholder="Your email subject..." maxlength="200" />
+                    <span class="small-text" id="subjectCount">0 / 200</span>
+                </div>
+
+                <!-- Message Body -->
+                <div class="card">
+                    <h3>✏️ Message Body</h3>
+                    <textarea id="bodyInput" placeholder="Write your email message here..." rows="6"></textarea>
+                    <span class="small-text" id="bodyCount">0 / 2000</span>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div>
+
+                <!-- Preview -->
+                <div class="card">
+                    <h3>👁️ Preview</h3>
+                    <div class="preview-box" id="previewBox">
+                        Your email preview will appear here...
+                    </div>
+                    <button class="btn-primary" onclick="generateEmails()" style="margin-top:12px;">
+                        🚀 Generate Emails
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div class="card">
+                    <h3>📊 Live Dashboard</h3>
+                    <div class="stats-row">
+                        <div class="stat-box">
+                            <div class="num" id="statTotal">0</div>
+                            <div class="label">Total Emails</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="num" id="statReady">0</div>
+                            <div class="label">Ready to Send</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="num" id="statSent">0</div>
+                            <div class="label">Sent</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Smart Templates -->
+                <div class="card">
+                    <h3>🧠 Smart Templates</h3>
+                    <div class="template-btns">
+                        <button onclick="setTemplate('quick')">Quick Question</button>
+                        <button onclick="setTemplate('followup')">Follow-up</button>
+                        <button onclick="setTemplate('intro')">Introduction</button>
+                        <button onclick="setTemplate('promo')">Promo</button>
+                    </div>
+                    <div class="action-row">
+                        <button class="btn-secondary" onclick="resetTemplates()">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Upload -->
+                <div class="card">
+                    <h3>📤 Smart File Upload</h3>
+                    <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
+                        <div>📁 Click to upload CSV, TXT, or Excel</div>
+                        <div class="small-text">AI will extract valid emails automatically</div>
+                        <input type="file" id="fileUpload" accept=".csv,.txt,.xlsx" onchange="handleFileUpload(event)" />
+                        <div class="small-text" id="uploadStatus">No file selected</div>
+                    </div>
+                    <button class="btn-secondary" onclick="processUpload()" style="width:100%; margin-top:8px;">Smart Upload</button>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Bottom: Ready to Launch -->
+        <div class="card full-width" style="margin-top:20px;">
+            <div class="flex-between">
+                <div>
+                    <h3 style="margin:0; font-size:16px;">🚀 Ready to Launch</h3>
+                    <span class="small-text">Click on any email below to open it in Gmail</span>
+                </div>
+                <button class="btn-primary" onclick="scrollToEmails()" style="width:auto; padding:10px 30px;">
+                    Go to Email Form →
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // State
+        let emails = [];
+        let sentEmails = new Set();
+
+        // DOM references
+        const emailInput = document.getElementById('emailInput');
+        const emailList = document.getElementById('emailList');
+        const emailCount = document.getElementById('emailCount');
+        const subjectInput = document.getElementById('subjectInput');
+        const bodyInput = document.getElementById('bodyInput');
+        const previewBox = document.getElementById('previewBox');
+        const statTotal = document.getElementById('statTotal');
+        const statReady = document.getElementById('statReady');
+        const statSent = document.getElementById('statSent');
+        const subjectCount = document.getElementById('subjectCount');
+        const bodyCount = document.getElementById('bodyCount');
+
+        // Parse emails from text
+        function parseEmails(text) {
+            const lines = text.split(/[\n,;]+/);
+            const valid = [];
+            const seen = new Set();
+            for (let line of lines) {
+                line = line.trim().toLowerCase();
+                // Simple email regex
+                if (line.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                    if (!seen.has(line)) {
+                        seen.add(line);
+                        valid.push(line);
+                    }
+                }
+            }
+            return valid;
+        }
+
+        // Update email list
+        function updateEmailList() {
+            const text = emailInput.value;
+            emails = parseEmails(text);
+            
+            if (emails.length === 0) {
+                emailList.innerHTML = `<div style="padding:20px;text-align:center;color:#9ca3af;font-size:14px;">
+                    No emails yet. Paste your list above.
+                </div>`;
+            } else {
+                emailList.innerHTML = emails.map((email, index) => {
+                    const isSent = sentEmails.has(email);
+                    return `
+                        <div class="email-item">
+                            <span class="addr">${email}</span>
+                            <div style="display:flex;gap:6px;align-items:center;">
+                                <span style="font-size:11px;color:${isSent ? '#22c55e' : '#6b7280'};">
+                                    ${isSent ? '✅ Sent' : '📤 Ready'}
+                                </span>
+                                <button class="btn-send" onclick="openGmail('${email}')">
+                                    📧 Gmail
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Update stats
+            const ready = emails.filter(e => !sentEmails.has(e)).length;
+            statTotal.textContent = emails.length;
+            statReady.textContent = ready;
+            statSent.textContent = sentEmails.size;
+            emailCount.textContent = `Total ${emails.length} emails`;
+
+            // Update preview
+            updatePreview();
+        }
+
+        // Open Gmail with pre-filled email
+        function openGmail(email) {
+            const subject = subjectInput.value || 'No subject';
+            const body = bodyInput.value || '';
+            const encodedSubject = encodeURIComponent(subject);
+            const encodedBody = encodeURIComponent(body);
+            
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodedSubject}&body=${encodedBody}`;
+            window.open(gmailUrl, '_blank');
+            
+            // Mark as sent
+            sentEmails.add(email);
+            updateEmailList();
+        }
+
+        // Generate emails (just updates the list)
+        function generateEmails() {
+            updateEmailList();
+            // Scroll to email list
+            document.getElementById('emailList').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Clear all emails
+        function clearEmails() {
+            emailInput.value = '';
+            sentEmails.clear();
+            updateEmailList();
+        }
+
+        // Update preview
+        function updatePreview() {
+            const subject = subjectInput.value || '[No Subject]';
+            const body = bodyInput.value || '[No message]';
+            previewBox.innerHTML = `
+                <strong style="color:#4f46e5;">Subject:</strong> ${subject}<br><br>
+                <strong style="color:#4f46e5;">Message:</strong><br>
+                ${body.replace(/\n/g, '<br>')}
+            `;
+        }
+
+        // Character counts
+        subjectInput.addEventListener('input', () => {
+            const len = subjectInput.value.length;
+            subjectCount.textContent = `${len} / 200`;
+            updatePreview();
+        });
+
+        bodyInput.addEventListener('input', () => {
+            const len = bodyInput.value.length;
+            bodyCount.textContent = `${len} / 2000`;
+            updatePreview();
+        });
+
+        emailInput.addEventListener('input', updateEmailList);
+
+        // Templates
+        function setTemplate(type) {
+            const templates = {
+                quick: {
+                    subject: 'Quick Question',
+                    body: `Hi there,
+
+I hope you're having a great day!
+
+I have a quick question about your services. Would you be available for a brief chat?
+
+Looking forward to your response.
+
+Best,
+Oliver`
+                },
+                followup: {
+                    subject: 'Following up',
+                    body: `Hi,
+
+I wanted to follow up on my previous email.
+
+Have you had a chance to think about this? I'd love to hear your thoughts.
+
+Let me know if you have any questions!
+
+Cheers,
+Oliver`
+                },
+                intro: {
+                    subject: 'Introduction - Oliver from EmailPro',
+                    body: `Hi,
+
+My name is Oliver and I'm reaching out from EmailPro.
+
+We help businesses like yours send professional emails at scale.
+
+Would you be open to a quick 5-minute call to see if we can help?
+
+Best,
+Oliver`
+                },
+                promo: {
+                    subject: 'Special Offer Just For You',
+                    body: `Hi there,
+
+I wanted to share an exclusive offer with you.
+
+For a limited time, we're offering 20% off our premium plan.
+
+This is a great opportunity to take your email outreach to the next level.
+
+Don't miss out!
+
+Oliver`
+                }
+            };
+
+            const t = templates[type];
+            if (t) {
+                subjectInput.value = t.subject;
+                bodyInput.value = t.body;
+                updatePreview();
+                // Update counts
+                subjectCount.textContent = `${t.subject.length} / 200`;
+                bodyCount.textContent = `${t.body.length} / 2000`;
+            }
+        }
+
+        function resetTemplates() {
+            subjectInput.value = '';
+            bodyInput.value = '';
+            updatePreview();
+            subjectCount.textContent = '0 / 200';
+            bodyCount.textContent = '0 / 2000';
+        }
+
+        // File upload
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            document.getElementById('uploadStatus').textContent = `📄 ${file.name}`;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                // Extract emails from text
+                const extracted = parseEmails(content);
+                if (extracted.length > 0) {
+                    const existing = emailInput.value.trim();
+                    const newText = existing ? existing + '\n' + extracted.join('\n') : extracted.join('\n');
+                    emailInput.value = newText;
+                    updateEmailList();
+                    document.getElementById('uploadStatus').textContent = `✅ Extracted ${extracted.length} emails from ${file.name}`;
+                } else {
+                    document.getElementById('uploadStatus').textContent = `⚠️ No valid emails found in ${file.name}`;
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function processUpload() {
+            document.getElementById('fileUpload').click();
+        }
+
+        function scrollToEmails() {
+            document.getElementById('emailList').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize
+        updateEmailList();
+
+        // Help text with example emails
+        if (!emailInput.value) {
+            emailInput.placeholder = 'john@example.com\nsarah@company.com\nmike@work.io\n\nPaste your email list here...';
+        }
+    </script>
+
+</body>
+</html>
